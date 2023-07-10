@@ -1,0 +1,8 @@
+body {
+  overflow:hidden
+}
+
+.window {
+  position: absolute;
+  cursor: move;
+}

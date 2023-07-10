@@ -1,0 +1,31 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/css/style.css')
+    link(rel='stylesheet', href="https://unpkg.com/98.css")
+    meta(name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no')
+  body
+    div.window(style="width:320px" draggable=true)
+      div.title-bar
+        div.title-bar-text Pixiv Parser
+        div.title-bar-controls
+          button(aria-label="Help")
+          button(aria-label="Close")
+      div.window-body
+        block content
+    div.window(style="width:320px" draggable=true)
+      div.title-bar
+        div.title-bar-text Pixiv Parser
+        div.title-bar-controls
+          button(aria-label="Help")
+          button(aria-label="Close")
+      div.window-body abc
+    div.window(style="width:320px" draggable=true)
+      div.title-bar
+        div.title-bar-text Pixiv Parser
+        div.title-bar-controls
+          button(aria-label="Help")
+          button(aria-label="Close")
+      div.window-body accc
+    script(src="/js/drag.js")
