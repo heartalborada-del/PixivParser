@@ -8,4 +8,7 @@ body {
 .window>.title-bar {
   cursor: move;
 }
+.window.active .title-bar .title-bar-controls button[aria-label=Close]:disabled {
+  background-color: unset!important;
+}
 

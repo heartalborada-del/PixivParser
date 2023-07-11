@@ -1,4 +1,30 @@
 extends layout
 
 block content
-  p Welcome to #{title}
+  div.window(style="width:320px" draggable=true)
+    div.title-bar
+      div.title-bar-text Welcome
+      div.title-bar-controls
+        button(aria-label="Close" disabled=true)
+    div.window-body.has-space
+      section(class="tabs")
+        menu(role="tablist", aria-label="Tabs Template")
+          button(role="tab", aria-controls="welcomeTab", aria-selected="true") Welcome
+          button(role="tab", aria-controls="tab-B") Tab B
+          button(role="tab", aria-controls="tab-C") Tab C
+        article#welcomeTab(role="tabpanel") Welcome to #{title}
+        article#tab-B(role="tabpanel", hidden=true) Tab B is active
+        article#tab-C(role="tabpanel", hidden=true) Tab C is active
+  div.window(style="width:320px" draggable=true)
+    div.title-bar
+      div.title-bar-text Tutorial
+      div.title-bar-controls
+        button(aria-label="Close")
+    div.window-body.has-space
+      p fill text
+  div.window(style="width:320px" draggable=true)
+    div.title-bar
+      div.title-bar-text Pixiv Parser
+      div.title-bar-controls
+        button(aria-label="Close")
+    div.window-body accc
