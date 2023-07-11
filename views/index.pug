@@ -1,30 +1,69 @@
 extends layout
 
 block content
-  div.window(style="width:320px" draggable=true)
-    div.title-bar
-      div.title-bar-text Welcome
-      div.title-bar-controls
-        button(aria-label="Close" disabled=true)
-    div.window-body.has-space
-      section(class="tabs")
-        menu(role="tablist", aria-label="Tabs Template")
-          button(role="tab", aria-controls="welcomeTab", aria-selected="true") Welcome
-          button(role="tab", aria-controls="tab-B") Tab B
-          button(role="tab", aria-controls="tab-C") Tab C
-        article#welcomeTab(role="tabpanel") Welcome to #{title}
-        article#tab-B(role="tabpanel", hidden=true) Tab B is active
-        article#tab-C(role="tabpanel", hidden=true) Tab C is active
-  div.window(style="width:320px" draggable=true)
-    div.title-bar
-      div.title-bar-text Tutorial
-      div.title-bar-controls
-        button(aria-label="Close")
-    div.window-body.has-space
-      p fill text
-  div.window(style="width:320px" draggable=true)
-    div.title-bar
-      div.title-bar-text Pixiv Parser
-      div.title-bar-controls
-        button(aria-label="Close")
-    div.window-body accc
+    div.window(style="width:320px" draggable=true)
+        div.title-bar
+            div.title-bar-text Main
+            div.title-bar-controls
+                button(aria-label="Close" disabled=true)
+        div.window-body.has-space
+            section(class="tabs")
+                menu(role="tablist", aria-label="Tabs Template")
+                    button(role="tab", aria-controls="welcomeTab", aria-selected="true") Welcome
+                    button(role="tab", aria-controls="settingTab") Setting
+                    button(role="tab", aria-controls="windowsTab") Windows
+                article#welcomeTab(role="tabpanel") Welcome to #{title}
+                article#settingTab(role="tabpanel", hidden=true)
+                    fieldset
+                        legend R18(G)
+                        input#R18.field-row(type='checkbox')
+                        label(for='R18') Enable R18
+                        input#R18G.field-row(type='checkbox')
+                        label(for='R18G') Enable R18G
+                        fieldset
+                            legend Blur
+                            input#BlurR18.field-row(type='checkbox' checked=true)
+                            label(for='BlurR18') For R18-Image Enable Blur
+                            div.field-row
+                                label Low
+                                input#BlurR18Range(type='range' min=1 max=100 value=10)
+                                label High
+                                div.preview(hidden=true)
+                                    img
+                            hr
+                            input#BlurR18G(type='checkbox' checked=true)
+                            label(for='BlurR18G') For R18G-Image Enable Blur
+                            div.field-row
+                                label Low
+                                input#BlurR18GRange(type='range' min=1 max=100 value=10)
+                                label High
+                                    div.preview(hidden=true)
+                                        img
+                    fieldset
+                        legend Tag
+                        div.field-row
+                            input#tagTranslate(type='checkbox' checked=true)
+                            label(for='tagTranslate') Show translated tag
+                        div.field-row
+                            label Language
+                            select#languageSelect
+                                option en-US
+                                option zh-CN
+                                //TODO 使选择框更加符合win7样式
+                article#windowsTab(role="tabpanel", hidden=true)
+                    fieldset
+                        legend Status
+
+    div.window(style="width:320px" draggable=true)
+        div.title-bar
+            div.title-bar-text Tutorial
+            div.title-bar-controls
+                button(aria-label="Close")
+        div.window-body.has-space
+            p fill text
+    div.window(style="width:320px" draggable=true)
+        div.title-bar
+            div.title-bar-text Pixiv Parser
+            div.title-bar-controls
+                button(aria-label="Close")
+        div.window-body accc
