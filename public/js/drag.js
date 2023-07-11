@@ -5,25 +5,39 @@ for (let i = 0; i < windows.length; i++) {
     dragElement(windows[i]);
 }
 
-function setHighestZIndex(element) {
-    for (let i = 0; i < windows.length; i++) {
-        if(windows[i]===element) {
-            windows[i].style.zIndex = windows.length
-        } else {
-            windows[i].style.zIndex = parseInt(window.getComputedStyle(windows[i]).zIndex)-1
-        }
-    }
-}
-
-
 // 拖动元素的函数
 function dragElement(elmnt) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     let titleBar = elmnt.querySelector('.title-bar');
     titleBar.onmousedown = dragMouseDown;
+    elmnt.onmousedown = dragNewIndex;
     elmnt.ondragstart = function() {
         return false; // 禁止复制操作
     };
+    function dragNewIndex(e) {
+        setActive()
+        setHighestZIndex()
+    }
+    function setHighestZIndex() {
+        for (let i = 0; i < windows.length; i++) {
+            if(windows[i]===elmnt) {
+                windows[i].style.zIndex = windows.length
+            } else {
+                windows[i].style.zIndex = parseInt(window.getComputedStyle(windows[i]).zIndex)-1
+            }
+        }
+    }
+
+    function setActive() {
+        for (let i = 0; i < windows.length; i++) {
+            if(windows[i]===elmnt) {
+                windows[i].classList.add('active')
+            } else {
+                if (windows[i].classList.contains('active'))
+                    windows[i].classList.remove('active')
+            }
+        }
+    }
     function dragMouseDown(e) {
         e = e || window.event;
         e.preventDefault();
@@ -32,7 +46,6 @@ function dragElement(elmnt) {
         pos4 = e.clientY;
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
-        setHighestZIndex(elmnt);
     }
     function elementDrag(e) {
         e = e || window.event;

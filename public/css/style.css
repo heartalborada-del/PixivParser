@@ -3,6 +3,9 @@ body {
 }
 
 .window {
-  position: absolute;
+  position: absolute !important;
+}
+.window>.title-bar {
   cursor: move;
 }
+
