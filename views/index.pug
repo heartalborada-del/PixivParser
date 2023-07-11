@@ -1,6 +1,7 @@
 extends layout
 
 block content
+    link(rel='stylesheet' href='/css/pages/main.css')
     div.window#main(style="width:320px" draggable=true)
         div.title-bar
             div.title-bar-text Main
@@ -10,7 +11,7 @@ block content
             section(class="tabs")
                 menu(role="tablist", aria-label="Tabs Template")
                     button(role="tab", aria-controls="welcomeTab", aria-selected="true") Welcome
-                    button(role="tab", aria-controls="settingTab") Setting
+                    button(role="tab", aria-controls="settingTab") Settings
                     button(role="tab", aria-controls="windowsTab") Windows
                 article#welcomeTab(role="tabpanel") Welcome to #{title}
                 article#settingTab(role="tabpanel", hidden=true)
@@ -53,6 +54,7 @@ block content
                 article#windowsTab(role="tabpanel", hidden=true)
                     fieldset
                         legend Status
+                        div#windowsStatusData
 
     div.window#tutorial(style="width:320px" draggable=true)
         div.title-bar
@@ -61,3 +63,4 @@ block content
                 button(aria-label="Close")
         div.window-body.has-space
             p fill text
+    script(src='/js/pages/main.js')

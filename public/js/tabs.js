@@ -8,7 +8,6 @@ function tabElement(elnmt) {
     for (let menuElement of menu) {
         menuElement.onclick = menuClick
     }
-
     function menuClick(e) {
         let src =e.srcElement;
         if(src.getAttribute('aria-selected') !== true) {
