@@ -1,7 +1,7 @@
 extends layout
 
 block content
-    div.window(style="width:320px" draggable=true)
+    div.window#main(style="width:320px" draggable=true)
         div.title-bar
             div.title-bar-text Main
             div.title-bar-controls
@@ -54,16 +54,10 @@ block content
                     fieldset
                         legend Status
 
-    div.window(style="width:320px" draggable=true)
+    div.window#tutorial(style="width:320px" draggable=true)
         div.title-bar
             div.title-bar-text Tutorial
             div.title-bar-controls
                 button(aria-label="Close")
         div.window-body.has-space
             p fill text
-    div.window(style="width:320px" draggable=true)
-        div.title-bar
-            div.title-bar-text Pixiv Parser
-            div.title-bar-controls
-                button(aria-label="Close")
-        div.window-body accc
