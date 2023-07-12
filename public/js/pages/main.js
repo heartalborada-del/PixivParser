@@ -145,7 +145,6 @@ function settingSave() {
         btn.addEventListener('click',toggleVisible);
         img.addEventListener('click',toggleVisible);
         new MutationObserver((list) => {
-            console.log('a')
             for (let mutationRecord of list) {
                 if (mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'disabled') {
                     if(mutationRecord.target.disabled && !img.hidden) {
@@ -154,7 +153,7 @@ function settingSave() {
                     }
                 }
             }
-        }).observe(fieldDiv.parentElement, {attributes: true,subtree:true})
+        }).observe(fieldDiv, {attributes: true})
         let toggle = parentDiv.parentElement.querySelector('input.blurToggle')
         img.style.filter = `blur(${defaultValue*(25/toggle.max)}px)`
         toggle.addEventListener('input',toggleChange)
