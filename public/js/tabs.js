@@ -6,7 +6,8 @@ function tabElement(elnmt) {
     let menu = elnmt.querySelector('menu').children
     let article = elnmt.querySelectorAll('article')
     for (let menuElement of menu) {
-        menuElement.onclick = menuClick
+
+        menuElement.addEventListener('click' , menuClick)
     }
     function menuClick(e) {
         let src =e.srcElement;

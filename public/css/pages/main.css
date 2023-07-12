@@ -41,3 +41,20 @@ fieldset:disabled > :nth-child(n) {
     opacity: .6;
     cursor: not-allowed;
 }
+div.preview {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+div.preview > .img {
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,.7);
+    overflow: hidden;
+}
+div.preview > .img > img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
