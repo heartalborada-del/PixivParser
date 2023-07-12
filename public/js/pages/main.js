@@ -153,7 +153,7 @@ function settingSave() {
                     }
                 }
             }
-        }).observe(fieldDiv, {attributes: true})
+        }).observe(fieldDiv.parentElement, {attributes: true,subtree:true})
         let toggle = parentDiv.parentElement.querySelector('input.blurToggle')
         img.style.filter = `blur(${defaultValue*(25/toggle.max)}px)`
         toggle.addEventListener('input',toggleChange)

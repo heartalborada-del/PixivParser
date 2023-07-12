@@ -1,196 +1,252 @@
-let db = openDatabase('PageSQL', '1.0', 'For Page Database', 2 * 1024 * 1024);
-db.transaction(function (tx) {
-    tx.executeSql('CREATE TABLE IF NOT EXISTS positions (id TEXT PRIMARY KEY, x REAL, y REAL, closed TEXT, zIndex INTEGER)');
-});
+let request = indexedDB.open('PageDB', 1);
 
-function savePosition(id, x, y, closed, zIndex) {
-    db.transaction(function (tx) {
-        tx.executeSql('INSERT OR REPLACE INTO positions (id, x, y, closed, zIndex) VALUES (?, ?, ?, ?, ?)', [id, x, y, closed, zIndex]);
-    });
-}
+request.onupgradeneeded = function(event) {
+    let db = event.target.result;
+    if (!db.objectStoreNames.contains('positions')) {
+        db.createObjectStore('positions', { keyPath: 'id' });
+    }
+};
 
-function getPosition(id, callback) {
-    db.transaction(function (tx) {
-        tx.executeSql('SELECT * FROM positions WHERE id = ?', [id], function (tx, result) {
-            if (result.rows.length > 0) {
-                let row = result.rows.item(0);
-                let position = {
-                    id: row.id,
-                    x: row.x,
-                    y: row.y,
-                    closed: row.closed,
-                    zIndex: row.zIndex
-                };
-                callback(position);
+request.onsuccess = function(event) {
+    let db = event.target.result;
+    let isTouch = isTouchDevice();
+
+    function savePosition(id, x, y, closed, zIndex) {
+        let transaction = db.transaction('positions', 'readwrite');
+        let store = transaction.objectStore('positions');
+
+        let position = {
+            id: id,
+            x: x,
+            y: y,
+            closed: closed,
+            zIndex: zIndex
+        };
+
+        let request = store.put(position);
+
+        request.onsuccess = function(event) {
+            console.log('Position saved successfully');
+        };
+
+        request.onerror = function(event) {
+            console.error('Error saving position:', event.target.error);
+        };
+    }
+
+    function getPosition(id, callback) {
+        let transaction = db.transaction('positions', 'readonly');
+        let store = transaction.objectStore('positions');
+
+        let request = store.get(id);
+
+        request.onsuccess = function(event) {
+            let position = event.target.result;
+            callback(position);
+        };
+
+        request.onerror = function(event) {
+            console.error('Error retrieving position:', event.target.error);
+            callback(null);
+        };
+    }
+
+    let windows = document.getElementsByClassName('window');
+
+    for (let i = 0; i < windows.length; i++) {
+        autoCalcMaxHeight(windows[i])
+        makeDraggable(windows[i]);
+        restorePosition(windows[i],i);
+    }
+
+    function autoCalcMaxHeight(window) {
+        new MutationObserver((list) => {
+            for (let mutationRecord of list) {
+                if(mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'hidden') {
+                    if(window.hidden !== true) {
+                        windowMaxHeight(window)
+                    }
+                    getPosition(window.id, function(position) {
+                        let x = parseFloat(window.style.left);
+                        let y = parseFloat(window.style.top);
+                        let closed = window.hidden ? 'true' : 'false';
+                        let zIndex = window.style.zIndex || 0;
+
+                        if (position) {
+                            savePosition(position.id, x, y, closed, zIndex);
+                        } else {
+                            savePosition(window.id, x, y, closed, zIndex);
+                        }
+                    });
+                }
+            }
+        }).observe(window,{attributes:true})
+    }
+    function setHighestZIndex(windowElement) {
+        if (windowElement.style.zIndex === ''||parseInt(windowElement.style.zIndex) < windows.length) {
+            for (let i = 0; i < windows.length; i++) {
+                let index = parseInt(window.getComputedStyle(windows[i]).zIndex) - 1
+                if (windows[i] === windowElement) {
+                    windows[i].style.zIndex = windows.length.toString()
+                    index = windows.length
+                } else {
+                    windows[i].style.zIndex = index.toString()
+                }
+                getPosition(windows[i].id, function (position) {
+                    if (position) {
+                        savePosition(position.id, position.x, position.y, position.closed, index);
+                    } else {
+                        savePosition(windows[i].id, parseFloat(windows[i].style.left), parseFloat(windows[i].style.top), windows[i].hidden ? 'true' : 'false', index);
+                    }
+                });
+            }
+        }
+    }
+    function makeDraggable(windowElement) {
+        let startEvent, moveEvent, endEvent;
+
+        if (isTouch) {
+            startEvent = 'touchstart';
+            moveEvent = 'touchmove';
+            endEvent = 'touchend';
+        } else {
+            startEvent = 'mousedown';
+            moveEvent = 'mousemove';
+            endEvent = 'mouseup';
+        }
+
+        let touchStartX, touchStartY, elementStartX, elementStartY;
+
+        windowElement.querySelector("div.title-bar").addEventListener(startEvent, handleDragStart, false);
+        windowElement.addEventListener(endEvent, handleDragEnd, false);
+        windowElement.addEventListener(startEvent,handleWindowClick,false);
+
+        let closeBtn = windowElement.querySelector("div.title-bar").querySelector('div.title-bar-controls').querySelector('button[aria-label="Close"]');
+        if(closeBtn.disabled !== true) {
+            closeBtn.addEventListener('click',() => {
+                windowElement.hidden = true
+            });
+            closeBtn.parentElement.addEventListener('mousedown', function (e) {
+                handleWindowClick(e)
+                e.stopPropagation();
+            });
+        }
+        function handleWindowClick(e) {
+            setHighestZIndex(windowElement)
+            for (let window of windows) {
+                if(window === windowElement) {
+                    window.classList.add('active');
+                    continue;
+                }
+                if(window.classList.contains('active'))
+                    window.classList.remove('active');
+            }
+        }
+        function handleDragStart(event) {
+            if (isTouch) {
+                let touch = event.touches[0];
+                touchStartX = touch.clientX;
+                touchStartY = touch.clientY;
             } else {
-                callback(null);
+                touchStartX = event.clientX;
+                touchStartY = event.clientY;
+            }
+
+
+            elementStartX = parseFloat(windowElement.style.left) || 0;
+            elementStartY = parseFloat(windowElement.style.top) || 0;
+
+            document.addEventListener(moveEvent, handleDragMove, false);
+        }
+
+        function handleDragMove(event) {
+            event.preventDefault();
+
+            let offsetX, offsetY;
+            if (isTouch) {
+                let touch = event.touches[0];
+                offsetX = touch.clientX - touchStartX;
+                offsetY = touch.clientY - touchStartY;
+            } else {
+                offsetX = event.clientX - touchStartX;
+                offsetY = event.clientY - touchStartY;
+            }
+
+            let newPosX = elementStartX + offsetX;
+            let newPosY = elementStartY + offsetY;
+
+            windowElement.style.left = newPosX + 'px';
+            windowElement.style.top = newPosY + 'px';
+        }
+
+        function handleDragEnd(event) {
+            document.removeEventListener(moveEvent, handleDragMove, false);
+
+            getPosition(windowElement.id, function(position) {
+                let x = parseFloat(windowElement.style.left);
+                let y = parseFloat(windowElement.style.top);
+                let closed = windowElement.hidden ? 'true' : 'false';
+                let zIndex = windowElement.style.zIndex || 0;
+
+                if (position) {
+                    savePosition(position.id, x, y, closed, zIndex);
+                } else {
+                    savePosition(windowElement.id, x, y, closed, zIndex);
+                }
+            });
+        }
+    }
+
+    function restorePosition(windowElement,i) {
+        getPosition(windowElement.id, function(position) {
+            if (position) {
+                windowElement.style.left = position.x + 'px';
+                windowElement.style.top = position.y + 'px';
+                windowElement.style.zIndex = position.zIndex;
+                windowElement.hidden = position.closed === 'true';
+            } else {
+                windowElement.style.left = (50 + 25 * i) + 'px';
+                windowElement.style.top = (30 + 27 * i)+ 'px';
+                windowElement.hidden = false;
             }
         });
-    });
-}
+    }
 
-let windows = document.getElementsByClassName("window")
-for (let i = 0, con = 0; i < windows.length; i++) {
-    getPosition(windows[i].id, pos => {
-        let x = (50 + 25 * i), y = (30 + 50 * i)
-        let zi = 0
-        let hidden = false
-        if (pos !== null) {
-            if (pos.x) x = pos.x
-            if (pos.y) y = pos.y
-            if (pos.zIndex) zi = pos.zIndex
-            if (pos.closed && pos.closed === 'true') hidden = true
-        }
-        windows[i].style.top = x + 'px'
-        windows[i].style.left = y + 'px'
-        windows[i].style.zIndex = zi
-        if (!hidden) windows[i].removeAttribute('hidden')
-        windowMaxHeight(windows[i])
-    })
-    windowElement(windows[i]);
-}
-
-function windowElement(elmnt) {
-    new MutationObserver((list, observer) => {
-        for (let mutationRecord of list) {
-            if (mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'hidden') {
-                getPosition(elmnt.id, pos => {
-                    if(!elmnt.hidden) windowMaxHeight(elmnt)
-                    if (pos !== null) {
-                        savePosition(elmnt.id, pos.x, pos.y, elmnt.hidden, pos.zIndex)
-                    } else {
-                        let xs = elmnt.style.top, ys = elmnt.style.left
-                        savePosition(elmnt.id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), 'false', elmnt.zIndex)
-                    }
-                })
+    function windowMaxHeight(windowElement) {
+        let body = windowElement.querySelector('div.window-body')
+        let usedPX = getBorderSize(windowElement) + parseFloat(getComputedStyle(body).marginBottom);
+        for (let child of windowElement.children) {
+            if (child !== body) {
+                usedPX += getBorderSize(child)
+                usedPX += child.clientHeight
             }
         }
-    }).observe(elmnt, {attributes: true})
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    let titleBar = elmnt.querySelector('.title-bar');
-    let btnCollection = titleBar.querySelector('.title-bar-controls').children
-    for (let btnCollectionElement of btnCollection) {
-        let type = btnCollectionElement.getAttribute('aria-label').toLowerCase()
-        if (type === 'close') {
-            btnCollectionElement.addEventListener('click' , closeWindow);
-        }
-    }
-    titleBar.addEventListener('mousedown',dragMouseDown)
-    titleBar.addEventListener('mouseup',dragMouseUp)
-    titleBar.querySelector('div.title-bar-controls').on
-    elmnt.addEventListener('mousedown',dragNewIndex)
-
-    elmnt.ondragstart = function () {
-        return false; // 禁止复制操作
-    };
-
-    function dragMouseUp(e) {
-        getPosition(elmnt.id, pos => {
-            let xs = elmnt.style.top, ys = elmnt.style.left
-            if (pos !== null) {
-                savePosition(elmnt.id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), pos.closed, pos.zIndex)
-            } else {
-                savePosition(elmnt.id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), 'false', elmnt.zIndex)
-            }
-        })
-    }
-
-    function closeWindow(e) {
-        elmnt.hidden = true
-    }
-
-    function dragNewIndex(e) {
-        setActive()
-        setHighestZIndex()
-    }
-
-    function setHighestZIndex() {
-        if (parseInt(elmnt.style.zIndex) === windows.length) {
-            return
-        }
-        for (let i = 0; i < windows.length; i++) {
-            let index = parseInt(window.getComputedStyle(windows[i]).zIndex) - 1
-            if (windows[i] === elmnt) {
-                windows[i].style.zIndex = windows.length
-                index = windows.length
-            } else {
-                windows[i].style.zIndex = index
-            }
-            getPosition(windows[i].id, pos => {
-                if (pos !== null) {
-                    savePosition(windows[i].id, pos.x, pos.y, pos.closed, index)
+        body.style.maxHeight = calculateParentMaxHeight(windowElement) - usedPX + 'px'
+        function calculateParentMaxHeight(parent) {
+            let maxHeight = getComputedStyle(parent).maxHeight
+            if(maxHeight != null) {
+                let p = parseFloat(getComputedStyle(parent).maxHeight);
+                if(maxHeight.includes('%')) {
+                    return (p / 100) * window.innerHeight;
                 } else {
-                    let xs = elmnt.style.top, ys = elmnt.style.left
-                    savePosition(windows[i].id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), 'false', index)
+                    return p
                 }
-            })
-        }
-    }
-
-    function setActive() {
-        for (let i = 0; i < windows.length; i++) {
-            if (windows[i] === elmnt) {
-                windows[i].classList.add('active')
             } else {
-                if (windows[i].classList.contains('active'))
-                    windows[i].classList.remove('active')
+                return parent.clientHeight
             }
         }
-    }
 
-    function dragMouseDown(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // 获取鼠标点击位置的初始坐标
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-
-    function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
-    }
-}
-
-function windowMaxHeight(ele) {
-    let body = ele.querySelector('div.window-body')
-    let usedPX = getBorderSize(ele) + parseFloat(getComputedStyle(body).marginBottom);
-    for (let child of ele.children) {
-        if (child !== body) {
-            usedPX += getBorderSize(child)
-            usedPX += child.clientHeight
+        function getBorderSize(element) {
+            let containerStyles = getComputedStyle(element);
+            return parseFloat(containerStyles.borderTopWidth) + parseFloat(containerStyles.paddingTop) + parseFloat(containerStyles.paddingBottom) + parseFloat(containerStyles.borderBottomWidth);
         }
     }
-    body.style.maxHeight = calculateParentMaxHeight(ele) - usedPX + 'px'
-    function calculateParentMaxHeight(parent) {
-        let maxHeight = getComputedStyle(parent).maxHeight
-        if(maxHeight != null) {
-            let p = parseFloat(getComputedStyle(parent).maxHeight);
-            if(maxHeight.includes('%')) {
-                return (p / 100) * window.innerHeight;
-            } else {
-                return p
-            }
-        } else {
-            return parent.clientHeight
-        }
-    }
+};
 
-    function getBorderSize(element) {
-        let containerStyles = getComputedStyle(element);
-        return parseFloat(containerStyles.borderTopWidth) + parseFloat(containerStyles.paddingTop) + parseFloat(containerStyles.paddingBottom) + parseFloat(containerStyles.borderBottomWidth);
-    }
+request.onerror = function(event) {
+    console.error('Error opening database:', event.target.error);
+};
+
+function isTouchDevice() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }

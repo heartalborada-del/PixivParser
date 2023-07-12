@@ -14,10 +14,6 @@ body {
   cursor: move;
 }
 
-.title-bar>.title-bar-controls {
-  pointer-events: none;
-}
-
 .window.active .title-bar .title-bar-controls button[aria-label=Close]:disabled {
   background: unset !important;
 }
