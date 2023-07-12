@@ -1,6 +1,6 @@
 let db = openDatabase('PageSQL', '1.0', 'For Page Database', 2 * 1024 * 1024);
 db.transaction(function(tx) {
-    tx.executeSql('CREATE TABLE IF NOT EXISTS positions (id TEXT PRIMARY KEY, x REAL, y REAL, closed INTEGER, zIndex INTEGER)');
+    tx.executeSql('CREATE TABLE IF NOT EXISTS positions (id TEXT PRIMARY KEY, x REAL, y REAL, closed TEXT, zIndex INTEGER)');
 });
 function savePosition(id, x, y, closed, zIndex) {
     db.transaction(function(tx) {
@@ -31,15 +31,17 @@ for (let i = 0,con = 0; i < windows.length; i++) {
     getPosition(windows[i].id, pos => {
         let x = (50 + 25 * i), y = (30 + 50 * i)
         let zi = 0
+        let hidden = false
         if (pos !== null) {
             if (pos.x) x = pos.x
             if (pos.y) y = pos.y
             if (pos.zIndex) zi = pos.zIndex
-            if (pos.closed && pos.closed === 'true') windows[i].hidden = true
+            if (pos.closed && pos.closed === 'true') hidden = true
         }
         windows[i].style.top = x+'px'
         windows[i].style.left = y+'px'
         windows[i].style.zIndex = zi
+        if(!hidden) windows[i].removeAttribute('hidden')
     })
     windowElement(windows[i]);
 }
@@ -53,7 +55,7 @@ function windowElement(elmnt) {
                         savePosition(elmnt.id, pos.x,pos.y,elmnt.hidden, pos.zIndex)
                     } else {
                         let xs = elmnt.style.top,ys = elmnt.style.left
-                        savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), elmnt.hidden, elmnt.zIndex)
+                        savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), 'false', elmnt.zIndex)
                     }
                 })
             }
@@ -81,7 +83,7 @@ function windowElement(elmnt) {
             if (pos !== null) {
                 savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2),pos.closed, pos.zIndex)
             } else {
-                savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), elmnt.hidden, elmnt.zIndex)
+                savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), 'false', elmnt.zIndex)
             }
         })
     }
@@ -110,7 +112,7 @@ function windowElement(elmnt) {
                     savePosition(windows[i].id, pos.x,pos.y,pos.closed, index)
                 } else {
                     let xs = elmnt.style.top,ys = elmnt.style.left
-                    savePosition(windows[i].id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), windows[i].hidden, index)
+                    savePosition(windows[i].id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), 'false', index)
                 }
             })
         }

@@ -2,7 +2,7 @@ extends layout
 
 block content
     link(rel='stylesheet' href='/css/pages/main.css')
-    div.window#main(style="width:320px" draggable=true)
+    div.window#main(style="width:320px" draggable=true hidden=true)
         div.title-bar
             div.title-bar-text Main
             div.title-bar-controls
@@ -17,29 +17,30 @@ block content
                 article#settingTab(role="tabpanel", hidden=true)
                     fieldset
                         legend R18(G)
-                        input#R18.field-row(type='checkbox')
-                        label(for='R18') Enable R18
-                        input#R18G.field-row(type='checkbox')
-                        label(for='R18G') Enable R18G
+                        input#r18.field-row(type='checkbox')
+                        label(for='r18') Enable R18
+                        input#r18G.field-row(type='checkbox')
+                        label(for='r18G') Enable R18G
                         fieldset
                             legend Blur
-                            input#BlurR18.field-row(type='checkbox' checked=true)
-                            label(for='BlurR18') For R18-Image Enable Blur
-                            div.field-row
-                                label Low
-                                input#BlurR18Range(type='range' min=1 max=100 value=10)
-                                label High
-                                div.preview(hidden=true)
-                                    img
-                            hr
-                            input#BlurR18G(type='checkbox' checked=true)
-                            label(for='BlurR18G') For R18G-Image Enable Blur
-                            div.field-row
-                                label Low
-                                input#BlurR18GRange(type='range' min=1 max=100 value=10)
-                                label High
+                            fieldset#blurR18Div
+                                input#blurR18.field-row(type='checkbox' checked=true)
+                                label(for='blurR18') For R18-Image Enable Blur
+                                div.field-row
+                                    label(for='blurR18Range') Low
+                                    input#blurR18Range(type='range' min=1 max=100 value=10)
+                                    label High
                                     div.preview(hidden=true)
                                         img
+                            fieldset#blurR18GDiv
+                                input#blurR18G(type='checkbox' checked=true)
+                                label(for='blurR18G') For R18G-Image Enable Blur
+                                div.field-row
+                                    label Low
+                                    input#blurR18GRange(type='range' min=1 max=100 value=10)
+                                    label High
+                                        div.preview(hidden=true)
+                                            img
                     fieldset
                         legend Tag
                         div.field-row
@@ -51,12 +52,14 @@ block content
                                 option en-US
                                 option zh-CN
                                 //TODO 使选择框更加符合win7样式
+                    div#settingRS
+                        button.save Save
+                        button.reset Reset
                 article#windowsTab(role="tabpanel", hidden=true)
                     fieldset
                         legend Status
                         div#windowsStatusData
-
-    div.window#tutorial(style="width:320px" draggable=true)
+    div.window#tutorial(style="width:320px" draggable=true hidden=true)
         div.title-bar
             div.title-bar-text Tutorial
             div.title-bar-controls
