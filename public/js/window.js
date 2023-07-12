@@ -1,15 +1,17 @@
 let db = openDatabase('PageSQL', '1.0', 'For Page Database', 2 * 1024 * 1024);
-db.transaction(function(tx) {
+db.transaction(function (tx) {
     tx.executeSql('CREATE TABLE IF NOT EXISTS positions (id TEXT PRIMARY KEY, x REAL, y REAL, closed TEXT, zIndex INTEGER)');
 });
+
 function savePosition(id, x, y, closed, zIndex) {
-    db.transaction(function(tx) {
+    db.transaction(function (tx) {
         tx.executeSql('INSERT OR REPLACE INTO positions (id, x, y, closed, zIndex) VALUES (?, ?, ?, ?, ?)', [id, x, y, closed, zIndex]);
     });
 }
+
 function getPosition(id, callback) {
-    db.transaction(function(tx) {
-        tx.executeSql('SELECT * FROM positions WHERE id = ?', [id], function(tx, result) {
+    db.transaction(function (tx) {
+        tx.executeSql('SELECT * FROM positions WHERE id = ?', [id], function (tx, result) {
             if (result.rows.length > 0) {
                 let row = result.rows.item(0);
                 let position = {
@@ -26,8 +28,9 @@ function getPosition(id, callback) {
         });
     });
 }
+
 let windows = document.getElementsByClassName("window")
-for (let i = 0,con = 0; i < windows.length; i++) {
+for (let i = 0, con = 0; i < windows.length; i++) {
     getPosition(windows[i].id, pos => {
         let x = (50 + 25 * i), y = (30 + 50 * i)
         let zi = 0
@@ -38,10 +41,11 @@ for (let i = 0,con = 0; i < windows.length; i++) {
             if (pos.zIndex) zi = pos.zIndex
             if (pos.closed && pos.closed === 'true') hidden = true
         }
-        windows[i].style.top = x+'px'
-        windows[i].style.left = y+'px'
+        windows[i].style.top = x + 'px'
+        windows[i].style.left = y + 'px'
         windows[i].style.zIndex = zi
-        if(!hidden) windows[i].removeAttribute('hidden')
+        if (!hidden) windows[i].removeAttribute('hidden')
+        windowMaxHeight(windows[i])
     })
     windowElement(windows[i]);
 }
@@ -49,18 +53,19 @@ for (let i = 0,con = 0; i < windows.length; i++) {
 function windowElement(elmnt) {
     new MutationObserver((list, observer) => {
         for (let mutationRecord of list) {
-            if(mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'hidden') {
-                getPosition(elmnt.id, pos =>{
+            if (mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'hidden') {
+                getPosition(elmnt.id, pos => {
+                    if(!elmnt.hidden) windowMaxHeight(elmnt)
                     if (pos !== null) {
-                        savePosition(elmnt.id, pos.x,pos.y,elmnt.hidden, pos.zIndex)
+                        savePosition(elmnt.id, pos.x, pos.y, elmnt.hidden, pos.zIndex)
                     } else {
-                        let xs = elmnt.style.top,ys = elmnt.style.left
-                        savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), 'false', elmnt.zIndex)
+                        let xs = elmnt.style.top, ys = elmnt.style.left
+                        savePosition(elmnt.id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), 'false', elmnt.zIndex)
                     }
                 })
             }
         }
-    }).observe(elmnt,{attributes:true})
+    }).observe(elmnt, {attributes: true})
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     let titleBar = elmnt.querySelector('.title-bar');
     let btnCollection = titleBar.querySelector('.title-bar-controls').children
@@ -78,41 +83,43 @@ function windowElement(elmnt) {
     };
 
     function dragMouseUp(e) {
-        getPosition(elmnt.id, pos =>{
-            let xs = elmnt.style.top,ys = elmnt.style.left
+        getPosition(elmnt.id, pos => {
+            let xs = elmnt.style.top, ys = elmnt.style.left
             if (pos !== null) {
-                savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2),pos.closed, pos.zIndex)
+                savePosition(elmnt.id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), pos.closed, pos.zIndex)
             } else {
-                savePosition(elmnt.id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), 'false', elmnt.zIndex)
+                savePosition(elmnt.id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), 'false', elmnt.zIndex)
             }
         })
     }
+
     function closeWindow(e) {
         elmnt.hidden = true
     }
+
     function dragNewIndex(e) {
         setActive()
         setHighestZIndex()
     }
 
     function setHighestZIndex() {
-        if(parseInt(elmnt.style.zIndex)  === windows.length) {
+        if (parseInt(elmnt.style.zIndex) === windows.length) {
             return
         }
         for (let i = 0; i < windows.length; i++) {
             let index = parseInt(window.getComputedStyle(windows[i]).zIndex) - 1
             if (windows[i] === elmnt) {
                 windows[i].style.zIndex = windows.length
-                index=windows.length
+                index = windows.length
             } else {
                 windows[i].style.zIndex = index
             }
-            getPosition(windows[i].id, pos =>{
+            getPosition(windows[i].id, pos => {
                 if (pos !== null) {
-                    savePosition(windows[i].id, pos.x,pos.y,pos.closed, index)
+                    savePosition(windows[i].id, pos.x, pos.y, pos.closed, index)
                 } else {
-                    let xs = elmnt.style.top,ys = elmnt.style.left
-                    savePosition(windows[i].id, xs.substring(0,xs.length -2), ys.substring(0,ys.length-2), 'false', index)
+                    let xs = elmnt.style.top, ys = elmnt.style.left
+                    savePosition(windows[i].id, xs.substring(0, xs.length - 2), ys.substring(0, ys.length - 2), 'false', index)
                 }
             })
         }
@@ -153,5 +160,35 @@ function windowElement(elmnt) {
     function closeDragElement() {
         document.onmouseup = null;
         document.onmousemove = null;
+    }
+}
+
+function windowMaxHeight(ele) {
+    let body = ele.querySelector('div.window-body')
+    let usedPX = getBorderSize(ele) + parseFloat(getComputedStyle(body).marginBottom);
+    for (let child of ele.children) {
+        if (child !== body) {
+            usedPX += getBorderSize(child)
+            usedPX += child.clientHeight
+        }
+    }
+    body.style.maxHeight = calculateParentMaxHeight(ele) - usedPX + 'px'
+    function calculateParentMaxHeight(parent) {
+        let maxHeight = getComputedStyle(parent).maxHeight
+        if(maxHeight != null) {
+            let p = parseFloat(getComputedStyle(parent).maxHeight);
+            if(maxHeight.includes('%')) {
+                return (p / 100) * window.innerHeight;
+            } else {
+                return p
+            }
+        } else {
+            return parent.clientHeight
+        }
+    }
+
+    function getBorderSize(element) {
+        let containerStyles = getComputedStyle(element);
+        return parseFloat(containerStyles.borderTopWidth) + parseFloat(containerStyles.paddingTop) + parseFloat(containerStyles.paddingBottom) + parseFloat(containerStyles.borderBottomWidth);
     }
 }

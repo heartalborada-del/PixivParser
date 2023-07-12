@@ -7,7 +7,7 @@ block content
             div.title-bar-text Main
             div.title-bar-controls
                 button(aria-label="Close" disabled=true)
-        div.window-body.has-space
+        div.window-body.has-space.has-scrollbar
             section(class="tabs")
                 menu(role="tablist", aria-label="Tabs Template")
                     button(role="tab", aria-controls="welcomeTab", aria-selected="true") Welcome
@@ -21,26 +21,34 @@ block content
                         label(for='r18') Enable R18
                         input#r18G.field-row(type='checkbox')
                         label(for='r18G') Enable R18G
-                        fieldset
-                            legend Blur
-                            fieldset#blurR18Div
-                                input#blurR18.field-row(type='checkbox' checked=true)
-                                label(for='blurR18') For R18-Image Enable Blur
+                    fieldset
+                        legend Blur
+                        fieldset#blurR18Div
+                            input#blurR18.field-row(type='checkbox' checked=true)
+                            label(for='blurR18') For R18-Image Enable Blur
+                            fieldset.range
                                 div.field-row
                                     label(for='blurR18Range') Low
-                                    input#blurR18Range(type='range' min=1 max=100 value=10)
+                                    input.blurToggle#blurR18Range(type='range' min=1 max=100 value=10)
                                     label High
-                                    div.preview(hidden=true)
-                                        img
-                            fieldset#blurR18GDiv
-                                input#blurR18G(type='checkbox' checked=true)
-                                label(for='blurR18G') For R18G-Image Enable Blur
+                                div.preview
+                                    div.btn
+                                        button.field-row Click Me To preview blur
+                                    div.img(hidden=true)
+                                        img.field-row(src='/img/preview/107066503_p0.png')
+                        fieldset#blurR18GDiv
+                            input#blurR18G(type='checkbox' checked=true)
+                            label(for='blurR18G') For R18G-Image Enable Blur
+                            fieldset.range
                                 div.field-row
                                     label Low
-                                    input#blurR18GRange(type='range' min=1 max=100 value=10)
+                                    input.blurToggle#blurR18GRange(type='range' min=1 max=100 value=10)
                                     label High
-                                        div.preview(hidden=true)
-                                            img
+                                div.preview
+                                    div.btn
+                                        button.field-row Click Me To preview blur
+                                    div.img(hidden=true)
+                                        img.field-row(src='/img/preview/107066503_p0.png')
                     fieldset
                         legend Tag
                         div.field-row
@@ -52,9 +60,6 @@ block content
                                 option en-US
                                 option zh-CN
                                 //TODO 使选择框更加符合win7样式
-                    div#settingRS
-                        button.save Save
-                        button.reset Reset
                 article#windowsTab(role="tabpanel", hidden=true)
                     fieldset
                         legend Status

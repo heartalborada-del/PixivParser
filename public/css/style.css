@@ -4,6 +4,11 @@ body {
 
 .window {
   position: absolute !important;
+  max-height: 70%;
+}
+.window>.window-body {
+  max-height: 100%;
+  overflow-y: auto;
 }
 .window>.title-bar {
   cursor: move;
