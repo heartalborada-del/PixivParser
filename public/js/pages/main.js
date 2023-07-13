@@ -82,7 +82,11 @@ function settingSave() {
             localStorage.setItem('blurR18GRange',e.srcElement.value)
         },
         tagTranslate: (e) => {
-            settingElementMap.get('languageSelect').disabled = !e.srcElement.checked
+            if(e.srcElement.checked) {
+                settingElementMap.get('languageSelect').parentElement.classList.add('disabled');
+            } else {
+                settingElementMap.get('languageSelect').parentElement.classList.remove('disabled');
+            }
             localStorage.setItem('tagTranslate',e.srcElement.checked)
         },
         languageSelect: (e) => {
@@ -105,7 +109,11 @@ function settingSave() {
         },
         blurR18GRange: (element) => {},
         tagTranslate: (element) => {
-            settingElementMap.get('languageSelect').disabled = !element.checked
+            if(element.checked) {
+                settingElementMap.get('languageSelect').parentElement.classList.add('disabled');
+            } else {
+                settingElementMap.get('languageSelect').parentElement.classList.remove('disabled');
+            }
         },
         languageSelect: (element) => {}
     }

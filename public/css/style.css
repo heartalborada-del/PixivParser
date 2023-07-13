@@ -17,3 +17,12 @@ body {
 .window.active .title-bar .title-bar-controls button[aria-label=Close]:disabled {
   background: unset !important;
 }
+
+div.no-scrollbar::-webkit-scrollbar {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+div.no-scrollbar::-webkit-scrollbar {
+  display:none
+}

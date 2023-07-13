@@ -54,7 +54,16 @@ request.onsuccess = function(event) {
     let windows = document.getElementsByClassName('window');
 
     for (let i = 0; i < windows.length; i++) {
-        autoCalcMaxHeight(windows[i])
+        autoCalcMaxHeight(windows[i]);
+        window.addEventListener('resize', () => {
+            if (!this.bAntiShike) {
+                this.bAntiShike = true
+                setTimeout(() => {
+                    windowMaxHeight(windows[i])
+                    this.bAntiShike = false
+                }, 100)
+            }
+        });
         makeDraggable(windows[i]);
         restorePosition(windows[i],i);
     }
