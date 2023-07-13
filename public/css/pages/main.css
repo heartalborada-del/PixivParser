@@ -7,7 +7,7 @@ button.statusBtn {
     outline-offset: unset;
 }
 
-fieldset:disabled > :nth-child(n) {
+fieldset:disabled > :nth-child(1n) {
     opacity: .6;
     cursor: not-allowed;
     pointer-events: none;
@@ -34,4 +34,94 @@ div.disabled {
     opacity: .6;
     cursor: not-allowed;
     pointer-events: none;
+}
+
+div.tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+div.tags > :nth-child(n+1) {
+    margin-left: 8px;
+}
+
+div.tag {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    border-left: 6px solid;
+    padding-top: 1px;;
+    padding-bottom: 2px;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+div.tag:not(.r18):not(.r18g) {
+    background: #bbdefb;
+    border-color: #1a237e;
+}
+
+div.tag > .untranslated {
+    color: #3949ab;
+    line-height: 1;
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+div.tag.r18 {
+    background: #ffccbc;
+    border-color: #d84315;
+}
+
+div.tag.r18 > .untranslated {
+    color: #ff5722;
+}
+
+div.tag.r18g {
+    background: #ffcdd2;
+    border-color: #b71c1c;
+}
+
+div.tag.r18g > .untranslated {
+    color: #e53935;
+}
+
+div.tag > :nth-child(n) {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+div.tag > .translated {
+    line-height: 1;
+    color: #616161;
+}
+
+div#illustrationDiv {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+div#illustrationDiv>div.img {
+    width: 80%;
+    margin-bottom: 5px;
+}
+
+div#illustrationDiv>div.img>img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+div#illustrationDiv>div.data>:not(:last-child){
+    margin-bottom: 5px;
+}
+
+div#illustrationDiv>div.data>div.input>#pidInput{
+    margin-right: 5px;
 }
