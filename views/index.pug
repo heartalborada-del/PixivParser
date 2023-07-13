@@ -70,14 +70,23 @@ block content
             div.title-bar-controls
                 button(aria-label="Close")
         div.window-body.has-space
-            p fill text
+            fieldset
+                legend Tag Style Preview
+                div.tags
+                    div.tag.r18g
+                        label.untranslated #R18G
+                    div.tag.r18
+                        label.untranslated #R18
+                    div.tag
+                        label.untranslated #Normal
+                        label.translated subTag
     div.window#viewer(style="width:500px" draggable=true hidden=true)
         div.title-bar
             div.title-bar-text Pixiv Image Viewer
             div.title-bar-controls
                 //button(aria-label='Maximize')
                 button(aria-label="Close")
-        div.window-body.has-space
+        div.window-body.has-space.no-scrollbar
             fieldset
                 legend Illustration Info
                 fieldset
