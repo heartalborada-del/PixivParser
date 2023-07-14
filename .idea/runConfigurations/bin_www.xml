@@ -2,9 +2,10 @@
   <configuration default="false" name="bin\www" type="NodeJSConfigurationType" path-to-js-file="bin/www" working-dir="$PROJECT_DIR$">
     <envs>
       <env name="DEBUG" value="pixivparser:*" />
+      <env name="ENVIRONMENT" value="DEVELOPMENT" />
     </envs>
     <EXTENSION ID="com.jetbrains.nodejs.run.NodeStartBrowserRunConfigurationExtension">
-      <browser start="true" url="http://localhost:3001/" />
+      <browser url="http://localhost:3001/" />
     </EXTENSION>
     <method v="2" />
   </configuration>

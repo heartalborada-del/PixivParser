@@ -18,7 +18,7 @@ router.get('/:pid/', function (req, res, next) {
     if(req.query.raw) {
         isRaw = req.query.raw;
     }
-    axios.create({
+    let axiosSetting = process.env.ENVIRONMENT === 'DEVELOPMENT' ? {
         proxy: {
             host: "127.0.0.1",
             port: 7890,
@@ -27,8 +27,15 @@ router.get('/:pid/', function (req, res, next) {
         headers: {
             "Accept-Language": `${lang}`,
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.165"
-        }
-    }).get(`https://www.pixiv.net/ajax/illust/${req.params.pid}`).then(resp => {
+        },
+    } : {
+        headers: {
+            "Accept-Language": `${lang}`,
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.165"
+        },
+        timeout:2000
+    };
+    axios.create(axiosSetting).get(`https://www.pixiv.net/ajax/illust/${req.params.pid}`).then(resp => {
         if (resp.data['error'] === true) {
             return res.json({
                 code: -1,
@@ -103,9 +110,14 @@ router.get('/:pid/', function (req, res, next) {
             data,
         });
     }).catch(e => {
+        if(e.response != null && e.response.data != null)
+            return res.json({
+                code: -1,
+                msg: e.response.data['message']
+            })
         return res.json({
             code: -1,
-            msg: e.response.data['message']
+            msg: e.message
         })
     })
 });
