@@ -67,6 +67,7 @@ IllustInfoDic.pidForm.addEventListener('submit', (e) => {
                 }
                 IllustInfoDic.pageSelect.parentElement.classList.remove('disabled');
                 removeAllOfChildren(IllustInfoDic.tagDisplay);
+                sessionStorage.setItem('r18Type','0');
                 for (let tag of illust['tags']) {
                     let name = tag['name'],sub = tag['translation'];
                     if(sub !== undefined) {
@@ -75,11 +76,16 @@ IllustInfoDic.pidForm.addEventListener('submit', (e) => {
                     let tagInstance = tagGenerate.normal(name,sub);
                     if(name === 'R-18') {
                         tagInstance = tagGenerate.r18(name,sub);
+                        if(sessionStorage.getItem('r18Type') === '0')
+                            sessionStorage.setItem('r18Type','1');
                     } else if (name === 'R-18G') {
                         tagInstance = tagGenerate.r18g(name,sub);
+                        sessionStorage.setItem('r18Type','2');
                     }
                     IllustInfoDic.tagDisplay.appendChild(tagInstance);
+                    //DEBUG
                 }
+                showImage('1','1')
             }
         }).catch(e => {
             console.log(e)
@@ -103,7 +109,11 @@ function formatDate (date) {
 }
 
 function removeAllOfChildren(parent) {
-    parent.innerHTML = '';
+    //deep clone
+    let node = Object.assign({},parent.children);
+    for (let nodeKey in node) {
+        parent.removeChild(node[nodeKey]);
+    }
 }
 
 function reInitIllustrationData(){
@@ -114,4 +124,8 @@ function reInitIllustrationData(){
     let opt = document.createElement('option');
     opt.textContent = 'No pages';
     IllustInfoDic.pageSelect.appendChild(opt);
+}
+
+function showImage(url,r18Type) {
+    //coming soooooon
 }
