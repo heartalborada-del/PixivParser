@@ -98,7 +98,7 @@ block content
                         div.data
                             div.input
                                 label(for='pidInput') Input PID&nbsp;&nbsp;
-                                input#pidInput(type='text')
+                                input#pidInput(type='text' pattern='^[0-9]*$' required=true)
                                 button#sendNewReq Get Illustration
                             div
                                 label(for='pageSelect') Select Illustration Page&nbsp;&nbsp;

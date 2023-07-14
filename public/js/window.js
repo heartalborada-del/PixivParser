@@ -10,7 +10,6 @@ request.onupgradeneeded = function(event) {
 request.onsuccess = function(event) {
     let db = event.target.result;
     let isTouch = isTouchDevice();
-
     function savePosition(id, x, y, closed, zIndex) {
         let transaction = db.transaction('positions', 'readwrite');
         let store = transaction.objectStore('positions');
@@ -53,17 +52,20 @@ request.onsuccess = function(event) {
 
     let windows = document.getElementsByClassName('window');
 
+    window.addEventListener('resize', () => {
+        if (!this.bAntiShike) {
+            this.bAntiShike = true;
+            setTimeout(() => {
+                for (let window of windows) {
+                    windowMaxHeight(window);
+                }
+                this.bAntiShike = false;
+            }, 100)
+        }
+    },false);
+
     for (let i = 0; i < windows.length; i++) {
         autoCalcMaxHeight(windows[i]);
-        window.addEventListener('resize', () => {
-            if (!this.bAntiShike) {
-                this.bAntiShike = true
-                setTimeout(() => {
-                    windowMaxHeight(windows[i])
-                    this.bAntiShike = false
-                }, 100)
-            }
-        });
         makeDraggable(windows[i]);
         restorePosition(windows[i],i);
     }
@@ -257,5 +259,6 @@ request.onerror = function(event) {
 };
 
 function isTouchDevice() {
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+    return ('ontouchstart' in window || (navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0)) && !(navigator.userAgent.match(/Firefox/i));
 }
+
