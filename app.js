@@ -22,7 +22,7 @@ app.get('/', function(req, res, next) {
   res.render('index', { title: 'Pixiv Parser' });
 });
 
-app.use('/getImageData', getImage);
+app.use('/api/getImageData', getImage);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
