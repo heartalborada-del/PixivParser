@@ -89,7 +89,7 @@ div.tag.r18g > .untranslated {
     color: #e53935;
 }
 
-div.tag > :nth-child(n) {
+div.tag > :nth-child(1n) {
     margin-left: 2px;
     margin-right: 2px;
 }
@@ -107,6 +107,15 @@ div#illustrationDiv {
     justify-content: center;
 }
 
+div#illustrationDiv > :nth-child(n) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
 div#illustrationDiv>div.img {
     width: 80%;
     margin-bottom: 5px;
@@ -122,6 +131,43 @@ div#illustrationDiv>div.data>:not(:last-child){
     margin-bottom: 5px;
 }
 
-div#illustrationDiv>div.data>div.input>#pidInput{
+div#illustrationDiv>div.data>form.input{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+div#illustrationDiv>div.data>form.input>#pidInput{
     margin-right: 5px;
+}
+
+div#illustrationDiv>div.info{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 5px;
+    margin-top: 3px;
+}
+
+div#illustrationDiv>div.info>div{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    margin-left: 8px;
+}
+
+div#illustrationDiv>div.info label{
+    font-weight: 500;
+}
+
+div#illustrationDiv>div.info img{
+    width: 1rem;
+    height: 1rem;
+    opacity: 80%;
 }

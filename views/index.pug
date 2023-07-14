@@ -80,6 +80,7 @@ block content
                     div.tag
                         label.untranslated #Normal
                         label.translated subTag
+    //TODO ADD TITLE
     div.window#viewer(style="width:500px" draggable=true hidden=true)
         div.title-bar
             div.title-bar-text Pixiv Image Viewer
@@ -89,25 +90,37 @@ block content
         div.window-body.has-space.no-scrollbar
             fieldset
                 legend Illustration Info
-                fieldset
-                    legend Illustration
-                    div#illustrationDiv
-                        div.img
-                            img(src='/img/status/No Image.png')
-                            //img(src='https://i.pixiv.re/img-master/img/2023/07/13/08/09/22/109868720_p0_master1200.jpg' style='height: 100%;width: 100%;object-fit: cover;')
-                        div.data
-                            div.input
-                                label(for='pidInput') Input PID&nbsp;&nbsp;
-                                input#pidInput(type='text' pattern='^[0-9]*$' required=true)
-                                button#sendNewReq Get Illustration
-                            div
-                                label(for='pageSelect') Select Illustration Page&nbsp;&nbsp;
-                                select#pageSelect
-                                    option(disabled=true) No pages
-                fieldset
-                    legend Tag
-                    div.tags#tagsDisplayDiv
-                        div.tag
-                            label.untranslated #EMPTY
+                div#illustrationDiv
+                    div.img
+                        img#illustDisplay(src='/img/status/No Image.png')
+                        //img(src='https://i.pixiv.re/img-master/img/2023/07/13/08/09/22/109868720_p0_master1200.jpg' style='height: 100%;width: 100%;object-fit: cover;')
+                    div.info
+                        div
+                            img(src="/img/icon/view.svg")
+                            label#illustView 114514
+                        div
+                            img(src="/img/icon/bookmark.svg")
+                            label#illustBookmark 1919
+                        div
+                            img(src="/img/icon/like.svg")
+                            label#illustLike 810
+                        div
+                            img(src="/img/icon/time.svg")
+                            label#illustTime 2077-01-01 00:00:00
+                    div.data
+                        form.input#pidForm
+                            label(for='pidInput') Input PID&nbsp;&nbsp;
+                            input#pidInput(autocomplete="off" type='text' pattern='^[0-9]*$' required=true placeholder="Input Pixiv Illustration ID")
+                            button Get Illustration
+                        div.disabled
+                            label(for='pageSelect') Select Illustration Page&nbsp;&nbsp;
+                            select#pageSelect
+                                option(disabled=true) No pages
+            fieldset
+                legend Tag
+                div.tags#tagsDisplayDiv
+                    div.tag
+                        label.untranslated #EMPTY
     script(src='/js/pages/main/setting.js')
     script(src='/js/pages/main/windowStatus.js')
+    script(src='/js/pages/main/illustration.js')

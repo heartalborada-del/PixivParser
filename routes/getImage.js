@@ -44,7 +44,7 @@ router.get('/:pid/', function (req, res, next) {
         }
         let bodyData = resp.data['body']
         if(isRaw) {
-            res.json({
+            return res.json({
                 code: 0,
                 msg: 'ok',
                 raw: bodyData,
@@ -86,8 +86,8 @@ router.get('/:pid/', function (req, res, next) {
             `${prefixZero(date.getHours(),2)}/`+
             `${prefixZero(date.getMinutes(),2)}/`+
             `${prefixZero(date.getSeconds(),2)}`
-        image.urls.regular= `{imageDomain}/img-master/${dateStr}/${req.params.pid}_p{selectPage}_master1200.jpg`
-        image.urls.original= `{imageDomain}/img-original/${dateStr}/${req.params.pid}_p{selectPage}.png`
+        image.urls.regular= `{imageDomain}/img-master/img/${dateStr}/${req.params.pid}_p{selectPage}_master1200.jpg`
+        image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`
         let data = {
             illust: {
                 info: {
