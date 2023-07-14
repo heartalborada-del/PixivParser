@@ -18,7 +18,7 @@ router.get('/:pid/', function (req, res, next) {
     if(req.query.raw) {
         isRaw = req.query.raw;
     }
-    let axiosSetting = process.env.ENVIRONMENT === 'DEVELOPMENT' ? {
+    let axiosSetting = process.env.NODE_ENV === 'development' ? {
         proxy: {
             host: "127.0.0.1",
             port: 7890,

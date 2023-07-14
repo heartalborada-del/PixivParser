@@ -4,7 +4,7 @@ body {
 
 .window {
   position: absolute !important;
-  max-height: 70%;
+  max-height: 80%;
 }
 .window>.window-body {
   max-height: 100%;
