@@ -1,4 +1,4 @@
-import {addStyle, removeStyle} from "../../dynamicCSS.js";
+import {addStyle, removeStyle} from "../../dynamicCSS.mjs";
 
 const settingElementMap = new Map();
 for (let el of document.querySelector('#settingTab').querySelectorAll('input,select')) {
