@@ -114,10 +114,13 @@ window.addEventListener('setItemEvent',(e) => {
         let target = e.target;
         let p = IllustInfoDic.pageSelect.options[IllustInfoDic.pageSelect.selectedIndex].text;
         let urls = sessionStorage.getItem('urls');
-        let json = JSON.parse(urls);
-        showImage(`/pixivImage/${urlParser(json['regular'],"",p)}`,sessionStorage.getItem('r18Type'));
+        if(urls !== null && urls !== undefined) {
+            let json = JSON.parse(urls);
+            showImage(`/pixivImage/${urlParser(json['regular'], "", p)}`, sessionStorage.getItem('r18Type'));
+        }
     }
 })
+
 function setNewInfo(view,bookmark,like,time) {
     IllustInfoDic.view.textContent = view;
     IllustInfoDic.bookmark.textContent = bookmark;
@@ -146,6 +149,7 @@ function removeAllOfChildren(parent) {
 function reInitIllustrationData(){
     sessionStorage.setItem('r18Type','0');
     showImage(defaultImagesPath.empty,'0');
+    sessionStorage.removeItem('urls');
     setNewInfo(0, 0, 0, '2077-01-01 00:00:00');
     removeAllOfChildren(IllustInfoDic.tagDisplay);
     IllustInfoDic.tagDisplay.appendChild(tagGenerate.normal("#Empty"));
