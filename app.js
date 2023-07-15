@@ -4,8 +4,8 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
-let getImage = require('./routes/getImage');
 let imageProxy = require('./routes/imageProxy');
+let api = require('./routes/api');
 
 let app = express();
 
@@ -23,7 +23,7 @@ app.get('/', function(req, res, next) {
   res.render('index', { title: 'Pixiv Parser' });
 });
 
-app.use('/api/getImageData', getImage);
+app.use('/api', api);
 
 app.use('/pixivImage',imageProxy);
 // catch 404 and forward to error handler
