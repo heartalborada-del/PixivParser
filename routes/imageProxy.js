@@ -11,6 +11,7 @@ const proxyMiddleware = process.env.NODE_ENV === 'development' ?  createProxyMid
     headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.170',
     },
+    logLevel: "debug"
 }) : createProxyMiddleware( {
     target: 'https://i.pximg.net',
     changeOrigin: true,
@@ -21,6 +22,7 @@ const proxyMiddleware = process.env.NODE_ENV === 'development' ?  createProxyMid
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.170',
         'Referer': 'https://www.pixiv.net/'
     },
+    logLevel: 'silent'
 });
 
 router.use('/', proxyMiddleware);

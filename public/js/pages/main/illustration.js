@@ -44,10 +44,11 @@ const tagGenerate = {
 }
 
 reInitIllustrationData()
+
 IllustInfoDic.pidForm.addEventListener('submit', (e) => {
     e.preventDefault();
     let pid = IllustInfoDic.pidInput.value;
-    axios.get(`/api/getImageData/${pid}`)
+    axios.get(localStorage.getItem('tagTranslate') === 'true' ? `/api/getImageData/${pid}?lang=${localStorage.getItem('languageSelect')}` : `/api/getImageData/${pid}`)
         .then(resp => {
             let json = resp['data']
             let data = json['data']
@@ -69,17 +70,17 @@ IllustInfoDic.pidForm.addEventListener('submit', (e) => {
                 removeAllOfChildren(IllustInfoDic.tagDisplay);
                 sessionStorage.setItem('r18Type','0');
                 for (let tag of illust['tags']) {
-                    let name = '#'+tag['name'],sub = tag['translation'];
+                    let name = tag['name'],sub = tag['translation'];
                     if(sub !== undefined) {
                         sub = sub['en'];
                     }
-                    let tagInstance = tagGenerate.normal(name,sub);
+                    let tagInstance = tagGenerate.normal('#'+name,sub);
                     if(name === 'R-18') {
-                        tagInstance = tagGenerate.r18(name,sub);
+                        tagInstance = tagGenerate.r18('#'+name,sub);
                         if(sessionStorage.getItem('r18Type') === '0')
                             sessionStorage.setItem('r18Type','1');
                     } else if (name === 'R-18G') {
-                        tagInstance = tagGenerate.r18g(name,sub);
+                        tagInstance = tagGenerate.r18g('#'+name,sub);
                         sessionStorage.setItem('r18Type','2');
                     }
                     IllustInfoDic.tagDisplay.appendChild(tagInstance);
@@ -99,13 +100,23 @@ IllustInfoDic.pageSelect.addEventListener('change', (e) => {
         let urls = sessionStorage.getItem('urls');
         let json = JSON.parse(urls);
         showImage(`/pixivImage/${urlParser(json['regular'],"",p)}`,sessionStorage.getItem('r18Type'));
-    } catch (e) {
-        console.log(e);
+    } catch (ex) {
+        console.log(ex);
     }
 })
 
-IllustInfoDic.pidInput.addEventListener('input',(e) => {
+IllustInfoDic.pidInput.addEventListener('input',() => {
     reInitIllustrationData();
+})
+
+window.addEventListener('setItemEvent',(e) => {
+    if(e.key === 'r18' || e.key === 'r18G') {
+        let target = e.target;
+        let p = IllustInfoDic.pageSelect.options[IllustInfoDic.pageSelect.selectedIndex].text;
+        let urls = sessionStorage.getItem('urls');
+        let json = JSON.parse(urls);
+        showImage(`/pixivImage/${urlParser(json['regular'],"",p)}`,sessionStorage.getItem('r18Type'));
+    }
 })
 function setNewInfo(view,bookmark,like,time) {
     IllustInfoDic.view.textContent = view;
@@ -134,7 +145,7 @@ function removeAllOfChildren(parent) {
 
 function reInitIllustrationData(){
     sessionStorage.setItem('r18Type','0');
-    showImage('/img/status/No Image.png','0');
+    showImage(defaultImagesPath.empty,'0');
     setNewInfo(0, 0, 0, '2077-01-01 00:00:00');
     removeAllOfChildren(IllustInfoDic.tagDisplay);
     IllustInfoDic.tagDisplay.appendChild(tagGenerate.normal("#Empty"));
@@ -146,7 +157,10 @@ function reInitIllustrationData(){
 }
 
 function showImage(url,r18Type) {
-    //TODO r18 类型模糊+判断
+    if((localStorage.getItem("r18") === 'false' && r18Type === '1') || (localStorage.getItem("r18G") === 'false' && r18Type === '2')) {
+        showImage(defaultImagesPath.filtered,'0');
+        return;
+    }
     if(IllustInfoDic.illustDisplay.getContext('2d')) {
         let ctx = IllustInfoDic.illustDisplay.getContext('2d')
         axios.get(url,{
@@ -157,6 +171,7 @@ function showImage(url,r18Type) {
             fr.addEventListener('load',ev => {
                 let img = new Image();
                 img.src = ev['target']['result'];
+                addR18OrGClass(r18Type);
                 img.addEventListener('load', ev => {
                     let w=ev.target.width,h=ev.target.height;
                     IllustInfoDic.illustDisplay.width = w;
@@ -165,6 +180,17 @@ function showImage(url,r18Type) {
                 })
             })
         })
+    }
+}
+
+function addR18OrGClass(r18Type){
+    IllustInfoDic.illustDisplay.classList.remove('r18');
+    IllustInfoDic.illustDisplay.classList.remove('r18g');
+    let type = parseInt(r18Type);
+    if(type === 1) {
+        IllustInfoDic.illustDisplay.classList.add('r18')
+    } else if (type === 2) {
+        IllustInfoDic.illustDisplay.classList.add('r18g')
     }
 }
 

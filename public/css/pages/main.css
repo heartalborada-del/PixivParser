@@ -19,11 +19,12 @@ div.preview {
     align-items: center;
     justify-content: center;
 }
-div.preview > .img {
+div.preview > .img  {
     border-radius: 2px;
     border: 1px solid rgba(0,0,0,.7);
     overflow: hidden;
 }
+
 div.preview > .img > img {
     height: 100%;
     width: 100%;
@@ -168,4 +169,10 @@ div#illustrationDiv>div.info img{
     width: 1rem;
     height: 1rem;
     opacity: 80%;
+}
+
+div#illustrationDiv > .img {
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,.7);
+    overflow: hidden;
 }
