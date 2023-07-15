@@ -121,9 +121,7 @@ div#illustrationDiv>div.img {
     margin-bottom: 5px;
 }
 
-div#illustrationDiv>div.img>img {
-    height: 100%;
-    width: 100%;
+div#illustrationDiv>div.img>canvas {
     object-fit: cover;
 }
 

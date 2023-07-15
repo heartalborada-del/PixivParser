@@ -12,7 +12,8 @@ const IllustInfoDic = {
     pidInput: document.querySelector('input#pidInput'),
     pidForm: document.querySelector('form.input#pidForm'),
     tagDisplay: document.querySelector('div.tags#tagsDisplayDiv'),
-    illustDisplay: document.querySelector('img#illustDisplay')
+    illustDisplay: document.querySelector('img#illustDisplay'),
+    imgDisplay: document.querySelector('canvas#illustDisplay')
 }
 
 const tagGenerate = {
@@ -85,7 +86,8 @@ IllustInfoDic.pidForm.addEventListener('submit', (e) => {
                     IllustInfoDic.tagDisplay.appendChild(tagInstance);
                     //DEBUG
                 }
-                showImage('1','1')
+                //showImage('/img/status/Error.png','1')
+                showImage('https://i.pixiv.re/img-master/img/2023/07/13/08/09/22/109868720_p0_master1200.jpg','1')
             }
         }).catch(e => {
             console.log(e)
@@ -100,12 +102,13 @@ function setNewInfo(view,bookmark,like,time) {
 }
 
 function formatDate (date) {
-    let y = date.getFullYear();
-    let m = date.getMonth() + 1;
-    m = m < 10 ? '0' + m : m;
-    let d = date.getDate();
-    d = d < 10 ? ('0' + d) : d;
-    return y + '-' + m + '-' + d;
+    let YY = date.getFullYear();
+    let MM = date.getMonth() + 1 < 10 ? '0' + date.getMonth() + 1 : date.getMonth() + 1;
+    let DD = date.getDate() < 10 ? ('0' + date.getDate()) : date.getDate();
+    let hh = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+    let mm = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+    let ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+    return `${YY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
 }
 
 function removeAllOfChildren(parent) {
@@ -117,6 +120,7 @@ function removeAllOfChildren(parent) {
 }
 
 function reInitIllustrationData(){
+    setNewInfo(0, 0, 0, '2077-01-01 00:00:00');
     removeAllOfChildren(IllustInfoDic.tagDisplay);
     IllustInfoDic.illustDisplay.src = defaultImagesPath.empty
     IllustInfoDic.pageSelect.parentElement.classList.add('disabled')
@@ -127,5 +131,30 @@ function reInitIllustrationData(){
 }
 
 function showImage(url,r18Type) {
-    //coming soooooon
+    if(IllustInfoDic.imgDisplay.getContext('2d')) {
+        let ctx = IllustInfoDic.imgDisplay.getContext('2d')
+        axios.get(window.URL.createObjectURL(url),{
+            responseType: 'blob'
+        }).then(resp => {
+            let fr = new FileReader()
+            fr.readAsDataURL(resp['data'])
+            fr.addEventListener('load',ev => {
+                let img = new Image();
+                console.log(this)
+                img.src = ev['target']['result'];
+                img.addEventListener('load', ev => {
+                    let w=ev.target.width,h=ev.target.height;
+                    let width = getCanvasWidth(IllustInfoDic.imgDisplay.parentElement,100)
+                    let scale = width/w;
+                    IllustInfoDic.imgDisplay.width = width;
+                    IllustInfoDic.imgDisplay.height = h*scale;
+                    ctx.drawImage(ev.target,0,0,width,h*scale);
+                })
+            })
+        })
+    }
+}
+
+function getCanvasWidth(parent,percent) {
+    return parent.clientWidth*percent/100;
 }

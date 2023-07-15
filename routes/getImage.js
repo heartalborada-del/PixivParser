@@ -1,6 +1,6 @@
-var express = require('express');
+let express = require('express');
 const axios = require("axios");
-var router = express.Router();
+let router = express.Router();
 
 /* GET pid Data */
 router.get('/:pid/', function (req, res, next) {
@@ -53,7 +53,7 @@ router.get('/:pid/', function (req, res, next) {
         let tags = [];
         let isR18 = false;
         bodyData['tags']['tags'].forEach(o => {
-            if(o['tag']==="R-18") isR18=true;
+            if(o['tag']==="R-18" || o['tag'] ==="R-18G") isR18=true;
             tags.push({
                 name: o['tag'],
                 translation:o['translation']
@@ -66,7 +66,8 @@ router.get('/:pid/', function (req, res, next) {
             },
             urls: {
                 regular: "",
-                original: ""
+                original: "",
+                zip: "",
             }
         }
         if (bodyData['userIllusts'][req.params.pid] == null) {
@@ -87,7 +88,19 @@ router.get('/:pid/', function (req, res, next) {
             `${prefixZero(date.getMinutes(),2)}/`+
             `${prefixZero(date.getSeconds(),2)}`
         image.urls.regular= `{imageDomain}/img-master/img/${dateStr}/${req.params.pid}_p{selectPage}_master1200.jpg`
-        image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`
+        //IllustType 0:illust 1:manga 2:ugoira
+        switch (bodyData['illustType']) {
+            case 0:
+                image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`;
+                break;
+            case 1:
+                image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`;
+                break;
+            case 2:
+                image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_ugoira{selectPage}.{ext}`;
+                image.urls.zip= `{imageDomain}/img-zip-ugoira/img/${dateStr}/${req.params.pid}_ugoira600x600.zip`;
+                break;
+        }
         let data = {
             illust: {
                 info: {
