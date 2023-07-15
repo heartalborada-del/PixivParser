@@ -87,18 +87,18 @@ router.get('/:pid/', function (req, res, next) {
             `${prefixZero(date.getHours(),2)}/`+
             `${prefixZero(date.getMinutes(),2)}/`+
             `${prefixZero(date.getSeconds(),2)}`
-        image.urls.regular= `{imageDomain}/img-master/img/${dateStr}/${req.params.pid}_p{selectPage}_master1200.jpg`
+        image.urls.regular= `/img-master/img/${dateStr}/${req.params.pid}_p{selectPage}_master1200.jpg`
         //IllustType 0:illust 1:manga 2:ugoira
         switch (bodyData['illustType']) {
             case 0:
-                image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`;
+                image.urls.original= `/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`;
                 break;
             case 1:
-                image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`;
+                image.urls.original= `/img-original/img/${dateStr}/${req.params.pid}_p{selectPage}.{ext}`;
                 break;
             case 2:
-                image.urls.original= `{imageDomain}/img-original/img/${dateStr}/${req.params.pid}_ugoira{selectPage}.{ext}`;
-                image.urls.zip= `{imageDomain}/img-zip-ugoira/img/${dateStr}/${req.params.pid}_ugoira600x600.zip`;
+                image.urls.original= `/img-original/img/${dateStr}/${req.params.pid}_ugoira{selectPage}.{ext}`;
+                image.urls.zip= `/img-zip-ugoira/img/${dateStr}/${req.params.pid}_ugoira600x600.zip`;
                 break;
         }
         let data = {

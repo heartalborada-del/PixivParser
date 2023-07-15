@@ -12,8 +12,7 @@ const IllustInfoDic = {
     pidInput: document.querySelector('input#pidInput'),
     pidForm: document.querySelector('form.input#pidForm'),
     tagDisplay: document.querySelector('div.tags#tagsDisplayDiv'),
-    illustDisplay: document.querySelector('img#illustDisplay'),
-    imgDisplay: document.querySelector('canvas#illustDisplay')
+    illustDisplay: document.querySelector('canvas#illustDisplay')
 }
 
 const tagGenerate = {
@@ -44,12 +43,12 @@ const tagGenerate = {
     },
 }
 
+reInitIllustrationData()
 IllustInfoDic.pidForm.addEventListener('submit', (e) => {
     e.preventDefault();
     let pid = IllustInfoDic.pidInput.value;
     axios.get(`/api/getImageData/${pid}`)
         .then(resp => {
-            console.log(resp)
             let json = resp['data']
             let data = json['data']
             if(data) {
@@ -58,7 +57,7 @@ IllustInfoDic.pidForm.addEventListener('submit', (e) => {
                     illust['info']['views'],
                     illust['info']['bookmarks'],
                     illust['info']['likes'],
-                    formatDate(new Date(data['illust']['image']['date']['create'].toString()))
+                    formatDate(new Date(illust['image']['date']['create'].toString()))
                 )
                 removeAllOfChildren(IllustInfoDic.pageSelect);
                 for(let i=0;i<parseInt(illust['info']["pages"]);i++){
@@ -70,7 +69,7 @@ IllustInfoDic.pidForm.addEventListener('submit', (e) => {
                 removeAllOfChildren(IllustInfoDic.tagDisplay);
                 sessionStorage.setItem('r18Type','0');
                 for (let tag of illust['tags']) {
-                    let name = tag['name'],sub = tag['translation'];
+                    let name = '#'+tag['name'],sub = tag['translation'];
                     if(sub !== undefined) {
                         sub = sub['en'];
                     }
@@ -84,16 +83,30 @@ IllustInfoDic.pidForm.addEventListener('submit', (e) => {
                         sessionStorage.setItem('r18Type','2');
                     }
                     IllustInfoDic.tagDisplay.appendChild(tagInstance);
-                    //DEBUG
                 }
-                //showImage('/img/status/Error.png','1')
-                showImage('https://i.pixiv.re/img-master/img/2023/07/13/08/09/22/109868720_p0_master1200.jpg','1')
+                sessionStorage.setItem('urls',JSON.stringify(illust['image']['urls']))
+                showImage(`/pixivImage/${urlParser(illust['image']['urls']['regular'])}`,sessionStorage.getItem('r18Type'));
             }
         }).catch(e => {
             console.log(e)
     })
 })
 
+IllustInfoDic.pageSelect.addEventListener('change', (e) => {
+    try {
+        let target = e.target;
+        let p = target.options[target.selectedIndex].text;
+        let urls = sessionStorage.getItem('urls');
+        let json = JSON.parse(urls);
+        showImage(`/pixivImage/${urlParser(json['regular'],"",p)}`,sessionStorage.getItem('r18Type'));
+    } catch (e) {
+        console.log(e);
+    }
+})
+
+IllustInfoDic.pidInput.addEventListener('input',(e) => {
+    reInitIllustrationData();
+})
 function setNewInfo(view,bookmark,like,time) {
     IllustInfoDic.view.textContent = view;
     IllustInfoDic.bookmark.textContent = bookmark;
@@ -103,8 +116,8 @@ function setNewInfo(view,bookmark,like,time) {
 
 function formatDate (date) {
     let YY = date.getFullYear();
-    let MM = date.getMonth() + 1 < 10 ? '0' + date.getMonth() + 1 : date.getMonth() + 1;
-    let DD = date.getDate() < 10 ? ('0' + date.getDate()) : date.getDate();
+    let MM = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+    let DD = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
     let hh = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
     let mm = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
     let ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
@@ -120,41 +133,44 @@ function removeAllOfChildren(parent) {
 }
 
 function reInitIllustrationData(){
+    sessionStorage.setItem('r18Type','0');
+    showImage('/img/status/No Image.png','0');
     setNewInfo(0, 0, 0, '2077-01-01 00:00:00');
     removeAllOfChildren(IllustInfoDic.tagDisplay);
-    IllustInfoDic.illustDisplay.src = defaultImagesPath.empty
+    IllustInfoDic.tagDisplay.appendChild(tagGenerate.normal("#Empty"));
     IllustInfoDic.pageSelect.parentElement.classList.add('disabled')
-    removeAllOfChildren(IllustInfoDic.pageSelect.parentElement)
+    removeAllOfChildren(IllustInfoDic.pageSelect)
     let opt = document.createElement('option');
     opt.textContent = 'No pages';
     IllustInfoDic.pageSelect.appendChild(opt);
 }
 
 function showImage(url,r18Type) {
-    if(IllustInfoDic.imgDisplay.getContext('2d')) {
-        let ctx = IllustInfoDic.imgDisplay.getContext('2d')
-        axios.get(window.URL.createObjectURL(url),{
+    //TODO r18 类型模糊+判断
+    if(IllustInfoDic.illustDisplay.getContext('2d')) {
+        let ctx = IllustInfoDic.illustDisplay.getContext('2d')
+        axios.get(url,{
             responseType: 'blob'
         }).then(resp => {
             let fr = new FileReader()
             fr.readAsDataURL(resp['data'])
             fr.addEventListener('load',ev => {
                 let img = new Image();
-                console.log(this)
                 img.src = ev['target']['result'];
                 img.addEventListener('load', ev => {
                     let w=ev.target.width,h=ev.target.height;
-                    let width = getCanvasWidth(IllustInfoDic.imgDisplay.parentElement,100)
-                    let scale = width/w;
-                    IllustInfoDic.imgDisplay.width = width;
-                    IllustInfoDic.imgDisplay.height = h*scale;
-                    ctx.drawImage(ev.target,0,0,width,h*scale);
+                    IllustInfoDic.illustDisplay.width = w;
+                    IllustInfoDic.illustDisplay.height = h;
+                    ctx.drawImage(ev.target,0,0,w,h);
                 })
             })
         })
     }
 }
 
-function getCanvasWidth(parent,percent) {
-    return parent.clientWidth*percent/100;
+function urlParser(url, ext='jpg', page=0) {
+    let copy = url;
+    copy = copy.replaceAll('{selectPage}',page.toString());
+    copy = copy.replaceAll('{ext}',ext);
+    return copy;
 }
